@@ -1128,15 +1128,17 @@
 
             <!-- Left: Order Form -->
             <div>
-                <!--
-                    WEBMAILER USAGE:
-                    When you have a Laravel controller ready, update action to your route:
-                    action="@{{ route('ticket.send') }}"
+                @if ($errors->any())
+                    <div class="info-banner" role="alert" style="margin-bottom: 12px;">
+                        <ul style="margin: 0; padding-left: 18px;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-                    In your Mailable / Controller:
-                    Mail::to($request->buyer_email)->send(new ConcertTicketMail($request->all()));
-                -->
-                <form id="ticketForm" action="#" method="POST">
+                <form id="ticketForm" action="{{ route('ticket.send') }}" method="POST">
                     @csrf
                     <input type="hidden" name="ticket_tier"     id="hiddenTier"     value="vip">
                     <input type="hidden" name="ticket_price"    id="hiddenPrice"    value="2850000">
@@ -1420,8 +1422,7 @@
                                 </svg>
                                 <span>
                                     <strong style="color: var(--c-text-2);">Webmailer:</strong>
-                                    Set <code style="font-family: 'Courier New'; background: var(--c-bg); padding: 1px 5px; border-radius: 3px; color: var(--c-text-2);">action="@{{ route('ticket.send') }}"</code>
-                                    on the form, then use <code style="font-family: 'Courier New'; background: var(--c-bg); padding: 1px 5px; border-radius: 3px; color: var(--c-text-2);">Mail::to($request->buyer_email)</code> in your controller to dispatch the e-ticket.
+                                    Pendaftaran akan disimpan ke database dan detail tiket akan diproses untuk dikirim ke email Anda.
                                 </span>
                             </div>
                         </div>
@@ -1646,29 +1647,6 @@
         diagram.classList.toggle('open');
         arrow.classList.toggle('open');
     }
-
-    /* ── Form Submit (learning helper) ────────────── */
-    document.getElementById('ticketForm').addEventListener('submit', function (e) {
-        const action = this.getAttribute('action');
-        if (!action || action === '#') {
-            e.preventDefault();
-            const name  = document.getElementById('buyer_name').value || '—';
-            const email = document.getElementById('buyer_email').value || '—';
-            const sub   = state.price * state.qty;
-            const tax   = Math.round(sub * TAX_RATE);
-            const total = sub + tax + ADMIN_FEE;
-            alert(
-                '✅ Form data captured successfully.\n\n' +
-                'Webmailer payload ready:\n' +
-                '  Name:     ' + name + '\n' +
-                '  Email:    ' + email + '\n' +
-                '  Category: ' + state.tierName + '\n' +
-                '  Quantity: ' + state.qty + '\n' +
-                '  Total:    ' + idr(total) + '\n\n' +
-                'To go live, set the form action to your POST route and call Mail::to($request->buyer_email) in your controller.'
-            );
-        }
-    });
 
     /* ── Init ──────────────────────────────────────── */
     recalc();
