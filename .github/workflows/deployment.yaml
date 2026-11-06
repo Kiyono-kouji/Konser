@@ -115,13 +115,13 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          sshpass -e rsync -avz --delete \
+          rsync -avz --delete \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='node_modules/' \
             --exclude='storage/*.key' \
             --exclude='.env' \
-            -e "ssh -o StrictHostKeyChecking=yes" \
+            -e "sshpass -e ssh -o StrictHostKeyChecking=yes" \
             ./ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}"
 
       - name: Execute Remote Post-Deployment Commands
