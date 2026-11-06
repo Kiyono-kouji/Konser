@@ -74,7 +74,7 @@ jobs:
   deploy:
     needs: laravel-tests
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # Only deploy if tests pass on the main branch
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout Code
