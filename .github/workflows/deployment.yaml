@@ -97,9 +97,16 @@ jobs:
           npm run build
 
       - name: Configure SSH Key
-        uses: shivammathur/setup-ssh@v1
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          local-ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Trust deployment host
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
 
       - name: Deploy files via rsync
         run: |
