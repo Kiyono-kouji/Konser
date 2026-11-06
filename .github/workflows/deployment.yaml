@@ -96,10 +96,10 @@ jobs:
           npm ci
           npm run build
 
-      - name: Configure SSH Key
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Install sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes sshpass
 
       - name: Trust deployment host
         env:
@@ -109,21 +109,27 @@ jobs:
           ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
 
       - name: Deploy files via rsync
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          rsync -avz --delete \
+          sshpass -e rsync -avz --delete \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='node_modules/' \
             --exclude='storage/*.key' \
             --exclude='.env' \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
+            -e "ssh -o StrictHostKeyChecking=yes" \
+            ./ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}"
 
       - name: Execute Remote Post-Deployment Commands
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             php artisan down --refresh=15 --retry=60
