@@ -1071,7 +1071,7 @@
         <a href="/" class="topbar-brand">
             <span class="brand-wordmark">LANY</span>
             <span class="brand-sep"></span>
-            <span class="brand-context">Official Ticket Purchase</span>
+            <span class="brand-context">Official Ticket Purchase Here</span>
         </a>
         <div class="topbar-chip">
             <span class="dot"></span>
